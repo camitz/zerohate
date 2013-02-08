@@ -54,13 +54,34 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			'dojo/_base/config',
 			'dojo/dom-style',
 			'dijit/registry',
+			'dojo/cookie',
 			'dojo/domReady!'
 		], 
-			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry) {
+			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry, cookie) {
 
-			parser.parse();
+				window.settings = cookie('settings') ? json.fromJson(cookie('settings')) :
+					{
+						keywords: {
+							severe: ['våldta', 'döda', 'vet var du bor'],
+							moderate: ['slyna']
+						}
+					};
+
+				cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
 
 
+				parser.parse().then(function() {
+					registry.byId('textarea_keywordsSevere').set('value', window.settings.keywords.severe.join(', '));
+					on(registry.byId('textarea_keywordsSevere'), 'change', function() {
+						window.settings.keywords.severe = registry.byId('textarea_keywordsSevere').get('value').split(', ');
+						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
+					});
+					registry.byId('textarea_keywordsModerate').set('value', window.settings.keywords.moderate.join(', '));
+					on(registry.byId('textarea_keywordsModerate'), 'change', function() {
+						window.settings.keywords.moderate = registry.byId('textarea_keywordsModerate').get('value').split(', ');
+						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
+					});
+				});
 
 			 /*set up data store*/
 				var data = {
@@ -148,7 +169,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			window.createTestComments = function(e) {
 					var i = 0;
 					keys = ['slyna', 'våldta', 'kärlek'];
-					for (i=0; i<100 ;i++ )
+					for (i = 0; i < 3 ;i++ )
 					{
 						 FB.api("204577813017231_204580473016965/comments", "post", {
 								message: keys[i%3] + " (" + i + ")",
@@ -162,7 +183,6 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 							  }
 						 });
 					}
-
 			};
 
 			window.deleteSelected = function(e) {
