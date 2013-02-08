@@ -17,6 +17,7 @@
 </head>
 <body class="claro">
 	<div id="fb-root"></div>
+    <script src="dojoConfig.js"></script>
     <!-- dojo.js is an AMD-compliant loader script. It accepts configuration either from a data-dojo-config attribute,
          as shown here, from a global dojoConfig object (which must be defined *before* dojo.js is loaded), or from
          a global require object.
@@ -37,7 +38,7 @@
 
 		 NOTE: `build.sh` is responsible for removing the "isDebug" flag when deploying to production. If you modify
 		 this flag at all, you will break the build! -->
-    <script data-dojo-config="async: 1, tlmSiblingOfDojo: 0, isDebug: 1, fbAppId: '510971358963852'" src="dojo/dojo.js"></script>
+    <script src="dojo/dojo.js"></script>
 
     <!-- Load the loader configuration script. Note that this module ID is hard-coded in build.sh in order to provide
          an optimised build that loads as few as one script for the entire application. If you change the name or
@@ -61,14 +62,14 @@
 				</script>
 			</button>
 			<br/>
-<!--
+
 			<button data-dojo-type="dijit.form.Button">
 			    Skapa test kommentarer
 			  <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
 					window.createTestComments(evt);
 				</script>
 			</button>			
--->
+
 
 	</div>
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" id='output' style="height:150px;overflow:auto"></div>
