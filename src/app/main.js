@@ -52,9 +52,11 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			'dojo/Deferred',
 			'dojo/promise/all',
 			'dojo/_base/config',
+			'dojo/dom-style',
+			'dijit/registry',
 			'dojo/domReady!'
 		], 
-			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config) {
+			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry) {
 
 			parser.parse();
 
@@ -221,6 +223,11 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				 });
 
 				store.save();
+
+				if (config.isDebug)
+				{
+					style.set(registry.byId('button_createTestComments').domNode, 'display', '');
+				}
 			};
 
 			 window.fbAsyncInit = function() {
