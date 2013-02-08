@@ -73,7 +73,9 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				/*set up layout*/
 				var layout = [[
 				  {'name': 'Name', 'field': 'name', 'width': '100px'},
+				  {'name': 'Time', 'field': 'create_time', 'width': '100px'},
 				  {'name': 'Comment', 'field': 'message', 'width': '300px'},
+				  {'name': 'Score', 'field': 'score', 'width': '300px'},
 				  {'name': 'Delete', 'field': 'delete', 'width': '100px',
 					formatter: function (val) {
                          var a = construct.create('a',
@@ -100,6 +102,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					structure: layout,
 					store: store,
 					selectionMode: 'extended',
+					sortInfo: -4,
 					rowSelector: '20px'});
 
 				/*append the new grid to the div*/
@@ -144,10 +147,11 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 
 			window.createTestComments = function(e) {
 					var i = 0;
+					keys = ['slyna', 'v√•ldta', 'k√§rlek'];
 					for (i=0; i<100 ;i++ )
 					{
 						 FB.api("204577813017231_204580473016965/comments", "post", {
-								message: "I hate you!! (" + i + ")",
+								message: keys[i%3] + " (" + i + ")",
 								access_token: window.page_access_token
 							}, function(response) {
 							   console.log(response);
@@ -193,6 +197,14 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				} 
 			};
 
+			window.score = function(message) {
+				var severeRex = new RegExp(registry.byId('textarea_keywordsSevere').get('value').split(', ').join('|'), 'igm');
+				var moderateRex = new RegExp(registry.byId('textarea_keywordsModerate').get('value').split(', ').join('|'), 'igm');
+
+				return message.match(severeRex) ? message.match(severeRex).length * 100 : 0
+					+ message.match(moderateRex) ? message.match(moderateRex).length : 0;
+			}
+
 			window.setPage = function(id, access_token) {
 				console.log('setPage ' + id + ' ' + access_token);
 
@@ -215,14 +227,26 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 							 FB.api(post.id+"/comments", {limit:5000}, function(response) {
 							   console.log(response);
 							   array.forEach(response.data, function(comment){
-									store.newItem({ id: comment.id, name: comment.from.name, fromid: comment.from.id, message: comment.message });
+									
+									store.newItem({ 
+										id: comment.id, 
+										name: comment.from.name, 
+										fromid: comment.from.id, 
+										message: comment.message,
+										created_time: comment.created_time,
+										score: window.score(comment.message)
+									});
 							   });
+
+								window.grid.sort();
 							 });
 					   }
 				   });
 				 });
 
 				store.save();
+				store.fetch({sort:[{attribute: "score", descending: true}]});
+				
 
 				if (config.isDebug)
 				{
@@ -325,7 +349,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					// but has not authenticated your app
 				  } else {
 					// the user isn't logged in to Facebook.
-					window.log('Hej! Kan vara lite svÂrt att ansluta till Facebook. Fˆrst mÂste man se till att inga popups blockeras. Sen ‰r det bara att vara ih‰rdig. Facebook behˆver ibland ˆvertygas om att man menar allvar med att logga in. Klicka, klicka, klicka....');
+					window.log('Hej! Kan vara lite sv√•rt att ansluta till Facebook. F√∂rst m√•ste man se till att inga popups blockeras. Sen √§r det bara att vara ih√§rdig. Facebook beh√∂ver ibland √∂vertygas om att man menar allvar med att logga in. Klicka, klicka, klicka....');
 						 FB.login(function(response) {
 						   if (response.authResponse) {
 							 console.log('Welcome!  Fetching your information.... ');
