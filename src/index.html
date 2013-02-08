@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Zero hate</title>
+    <!-- Application-specific CSS should be stored in your application’s package to ensure portability and to allow
+         the build system to combine & minify it. -->
+    <link rel="stylesheet" href="app/resources/app.css">
+	<style>
+		@import "dojox/grid/resources/claroGrid.css";
+
+		/*Grid needs an explicit height by default*/
+		#gridDiv {
+			height: 750px;
+		}
+	</style>
+</head>
+<body class="claro">
+	<div id="fb-root"></div>
+    <!-- dojo.js is an AMD-compliant loader script. It accepts configuration either from a data-dojo-config attribute,
+         as shown here, from a global dojoConfig object (which must be defined *before* dojo.js is loaded), or from
+         a global require object.
+
+         Configuration options for the loader can be viewed at http://dojotoolkit.org/reference-guide/loader/amd.html
+         along with a bunch of additional information about its features.
+
+         Below, we’re doing the following:
+
+         1. Enabling the AMD loader. (async: 1)
+         2. Fixing the loader to use normal AMD resolution of unregistered module paths (relative to baseDir)
+            instead of the traditional Dojo resolution method (relative to the parent of baseDir).
+            (tlmSiblingOfDojo: 0)
+         3. Enabling debugging. (isDebug: 1)
+
+         The remainder of Dojo configuration, as well as our application’s instantiation, occurs within
+         app/run.js.
+
+		 NOTE: `build.sh` is responsible for removing the "isDebug" flag when deploying to production. If you modify
+		 this flag at all, you will break the build! -->
+    <script data-dojo-config="async: 1, tlmSiblingOfDojo: 0, isDebug: 1, fbAppId: '510971358963852'" src="dojo/dojo.js"></script>
+
+    <!-- Load the loader configuration script. Note that this module ID is hard-coded in build.sh in order to provide
+         an optimised build that loads as few as one script for the entire application. If you change the name or
+         location of this module, you will need to update build.sh too. -->
+    <script src="app/run.js"></script>
+
+	<div data-dojo-type="dijit/layout/BorderContainer" style="width: 100%; height: 100%;">
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">Zero Hate! (beta) - Behåll försprånget till näthatet. mvh @martincamitz</div>
+    <div data-dojo-type="dijit/layout/AccordionContainer" data-dojo-props="region:'leading'">
+        <div data-dojo-type="dijit/layout/AccordionPane" title="Pages" style='width:200px'><ul id="pages_list"></ul></div>
+    </div>
+    <div data-dojo-type="dijit/layout/TabContainer" data-dojo-props="region:'center'">
+        <div data-dojo-type="dijit/layout/ContentPane" title="Comments"><div id="gridDiv"></div></div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Sökord">Not yet! Här ska man kunna skriva in sökord som rangordnar kommentarerna.</div>
+    </div>
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'trailing'" id='traling_pane'>
+		    <button data-dojo-type="dijit.form.Button">
+			    Ta bort markerade
+			  <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+					window.deleteSelected(evt);
+				</script>
+			</button>
+			<br/>
+<!--
+			<button data-dojo-type="dijit.form.Button">
+			    Skapa test kommentarer
+			  <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+					window.createTestComments(evt);
+				</script>
+			</button>			
+-->
+
+	</div>
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" id='output' style="height:150px;overflow:auto"></div>
+</div>
+</body>
+</html>
