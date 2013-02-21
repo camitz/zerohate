@@ -67,7 +67,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					{
 						keywords: {
 							severe: ['våldta', 'döda', 'vet var du bor', 'basebollträ'],
-							moderate: ['slyna', 'hora']
+							moderate: ['slyna', 'hora', 'fitta', 'felknulla', 'sneknulla', 'knulla', 'fitta']
 						}
 					};
 
@@ -79,13 +79,30 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					on(registry.byId('textarea_keywordsSevere'), 'change', function() {
 						window.settings.keywords.severe = registry.byId('textarea_keywordsSevere').get('value').split(', ');
 						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
+						window.refreshGrid();
 					});
+
 					registry.byId('textarea_keywordsModerate').set('value', window.settings.keywords.moderate.join(', '));
 					on(registry.byId('textarea_keywordsModerate'), 'change', function() {
 						window.settings.keywords.moderate = registry.byId('textarea_keywordsModerate').get('value').split(', ');
 						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
+						window.refreshGrid();
 					});
 				});
+
+				window.refreshGrid = function() {
+					if (window.grid && window.grid.store) {
+						array.forEach(window.grid.store._arrayOfAllItems, function(item) {
+							item.score[0] = window.score(item.message[0]);
+						});
+
+						window.grid.setStore(window.grid.store);
+						window.grid.sort();
+						window.grid.store.fetch({sort:[{attribute: "score", descending: true}]});
+						window.grid.store.save();
+						window.grid.setStore(window.grid.store);
+					}
+				}
 
 				window.initGrid = function() {
 					if (window.grid)
@@ -239,25 +256,38 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					+ message.match(moderateRex) ? message.match(moderateRex).length : 0;
 			}
 
-			window.togglePage = function(id, access_token) {
-				console.log('setPage ' + id + ' ' + access_token);
+			window.togglePage = function(id, access_token, checked) {
+				console.log('togglePage ' + id + ' ' + access_token);
 
-				 FB.api('/'+id+'/posts', {limit:5000}, function(response) {
-				   console.log(response);
+				window.selectedPages = window.selectedPages || {};
 
-					var data = {
-					  identifier: "id",
-					  label: "name",
-					  items: []
-					};
+				if (checked)
+					window.selectedPages[id] = {id: id, access_token: access_token};
+				else
+					delete window.selectedPages[id];
 
-					var store = new ItemFileWriteStore({data: data});
+				window.updateGrid();
+			};
 
-					window.grid.setStore(store);
+			window.updateGrid = function() {
+			
+				var store = new ItemFileWriteStore({data: {
+						  identifier: "id",
+						  label: "name",
+						  items: []
+						}});
+				window.grid.setStore(store);
 
-				   array.forEach(response.data, function(post){
-					   if (post.comments && post.comments.count)
-					   {
+				for (var i in window.selectedPages) {
+					var page = window.selectedPages[i];
+
+					window.log("Fetching posts. Please hang on.");
+					var options = {limit:5000};
+					FB.api('/'+page.id+'/posts', options, function(response) {
+						window.log("Retrieved " + response.data.length + " commments.");
+					   console.log(response);
+
+					   array.forEach(response.data, function(post){
 							 FB.api(post.id+"/comments", {limit:5000}, function(response) {
 							   console.log(response);
 							   array.forEach(response.data, function(comment){
@@ -274,13 +304,12 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 
 								window.grid.sort();
 							 });
-					   }
-				   });
-					store.save();
-					store.fetch({sort:[{attribute: "score", descending: true}]});
-				 });
+					   });
+					 });
+				}
 
-				
+				store.save();
+				store.fetch({sort:[{attribute: "score", descending: true}]});
 
 				if (config.isDebug)
 				{
@@ -378,13 +407,15 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				FB.Event.subscribe('auth.statusChange', function (response) {
 					 console.debug('auth.statusChange'+json.toJson(response));
 
-					 if (response.status==='not_authorized')
-					 {
-					 }
+					 if (response.status==='not_authorized') {}
 				});
 
 				FB.getLoginStatus(function(response) {
 				  if (response.status === 'connected') {
+					  FB.api('/me', function(response) {
+						window.log("Logged in as " + response.name + ".");
+					  });
+
 					var uid = response.authResponse.userID;
 					var accessToken = response.authResponse.accessToken;
 
