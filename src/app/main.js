@@ -65,30 +65,33 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 
 				window.settings = cookie('settings') ? json.fromJson(cookie('settings')) :
 					{
-						keywords: {
-							severe: ['våldta', 'döda', 'vet var du bor', 'basebollträ'],
-							moderate: ['slyna', 'hora', 'fitta', 'felknulla', 'sneknulla', 'knulla', 'fitta']
-						}
+						keywords: {}
 					};
 
+				if (!window.settings.keywords.version || window.settings.keywords.version < 1)
+					window.settings.keywords = {
+							version: 1,
+							moderate: ['blatt','riktig slyna','riktig hora','ful','hiskeligt ful','grotesk','groteskt ful','ful kvinna','fulaste kvinna','subba','pryd','jävla subba','knulla','patetisk','mental','underlägsen','såna som du','sådana som du','kärring','jävla kärring','svenskfientlig','svin','jävla svin','kackerlacka','hålla käften','håll käft','uppkörd','köra upp','intelligen','trygg','knulla dig','din fitta','straff','straffknulla','muslimälska','massa muslimer','massa invandrare','prissdränkta ','fittluder','hipsterkryp','luder','dränka','dränker sig','feministhora','fet','äcklig','din jävla','din ful','ska dö','neger','feministas','feministsvin','manshatare','ditt äcklig','din äcklig','bra feminist','stoppa kuken','kuken i di','det där ansiktet','sex'],
+							severe: ['kvar att leva','knulla sönder','knullas sönder','dö','döda','ultimatum','skära halsen','halsen av dig','kniven','minst anar','mörda','mörda dig','gruppvåldta','utanför din dörr','utanför ditt hus','utanför ditt hem','steka dina bröst','','styckning','köttkrokar','polisjävlar','basebollträ','vet var du bor']
+					};
+						
 				cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
 
 
 				parser.parse().then(function() {
-					registry.byId('textarea_keywordsSevere').set('value', window.settings.keywords.severe.join(', '));
-					on(registry.byId('textarea_keywordsSevere'), 'change', function() {
-						window.settings.keywords.severe = registry.byId('textarea_keywordsSevere').get('value').split(', ');
-						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
-						window.refreshGrid();
-					});
-
-					registry.byId('textarea_keywordsModerate').set('value', window.settings.keywords.moderate.join(', '));
-					on(registry.byId('textarea_keywordsModerate'), 'change', function() {
-						window.settings.keywords.moderate = registry.byId('textarea_keywordsModerate').get('value').split(', ');
-						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
-						window.refreshGrid();
-					});
+					window.keywordChange('Severe');
+					window.keywordChange('Moderate');
 				});
+
+				window.keywordChange = function(level) {
+					registry.byId('textarea_keywords'+level).set('value', window.settings.keywords[level.toLowerCase()].join(', '));
+
+					on(registry.byId('textarea_keywords'+level), 'change', lang.partial(function(level) {
+						window.settings.keywords[level.toLowerCase()] = array.map(registry.byId('textarea_keywords'+level).get('value').split(','), function(kw) { return kw.trim(); });
+						cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
+						window.refreshGrid();
+					}, level));
+				};
 
 				window.refreshGrid = function() {
 					if (window.grid && window.grid.store) {
@@ -96,10 +99,6 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 							item.score[0] = window.score(item.message[0]);
 						});
 
-						window.grid.setStore(window.grid.store);
-						window.grid.sort();
-						window.grid.store.fetch({sort:[{attribute: "score", descending: true}]});
-						window.grid.store.save();
 						window.grid.setStore(window.grid.store);
 					}
 				}
