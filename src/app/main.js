@@ -87,83 +87,90 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					});
 				});
 
-			 /*set up data store*/
-				var data = {
-				  identifier: "id",
-				  items: []
-				};
-
-				var store = new ItemFileWriteStore({data: data});
-
-				/*set up layout*/
-				var layout = [[
-				  {'name': 'Name', 'field': 'name', 'width': '100px'},
-				  {'name': 'Time', 'field': 'created_time', 'width': '120px', formatter: function(value) { 
-							return value && stamp.fromISOString(value) ? locale.format(stamp.fromISOString(value), {datePattern:'yyyy-MM-dd', timePattern:'HH:mm:ss'}) : value; 
-						}
-				  },
-				  {'name': 'Comment', 'field': 'message', 'width': '300px'},
-				  {'name': 'Score', 'field': 'score', 'width': '300px'},
-				  {'name': 'Delete', 'field': 'delete', 'width': '100px',
-					formatter: function (val) {
-                         var a = construct.create('a',
-                                {
-                                    href: '#',
-                                    innerHTML: "delete",
-                                    title: "Delete comment"
-                                },
-                                construct.create('span'));
-						
-//						 on(a, 'click', lang.partial(function(){alert();}));
-
-                         return a.parentNode.innerHTML;
-                     },
-                     get: function (rowIdx, row) {
-                         return row;
-                     }
-				}
-				]];
-
-				/*create a new grid*/
-				var grid = new DataGrid({
-					id: 'grid',
-					structure: layout,
-					store: store,
-					selectionMode: 'extended',
-					sortInfo: -4,
-					rowSelector: '20px'});
-
-				/*append the new grid to the div*/
-				grid.placeAt("gridDiv");
-
-				/*Call startup() to render the grid*/
-				grid.startup();
-
-				on(grid, 'rowClick', function(e){
-					console.log(e.cell);
-					if (!(e.cell && e.cell.field==='delete'))
+				window.initGrid = function() {
+					if (window.grid)
 						return;
 
-					var item = e.grid.getItem(e.rowIndex);
-//					storeItem = e.grid.store._itemsByIdentity[item.id];
+				 /*set up data store*/
+					var data = {
+					  identifier: "id",
+					  items: []
+					};
 
-					window.log('Sending delete request to FB: "'+item.message+'"');
-					console.log(item.id[0] + ': deleting...');
-		
-					 FB.api(item.id[0], 'delete', function(response) {
-						   console.log(response);
-						   if (!response || response.error) {
-								console.log('Error deleting from FB: ', item.id[0]);
-						  } else {
-								e.grid.store.deleteItem(item);					
-								e.grid.store.save();
-								console.log(item.id[0] + ': deleted from FB.');
-								window.log('Delete successful: "'+item.message+'"');
-						  }
-					 });
-				});
+					var store = new ItemFileWriteStore({data: data});
 
-				window.grid=grid;
+					/*set up layout*/
+					var layout = [[
+					  {'name': 'Name', 'field': 'name', 'width': '100px'},
+					  {'name': 'Time', 'field': 'created_time', 'width': '120px', formatter: function(value) { 
+								return value && stamp.fromISOString(value) ? locale.format(stamp.fromISOString(value), {datePattern:'yyyy-MM-dd', timePattern:'HH:mm:ss'}) : value; 
+							}
+					  },
+					  {'name': 'Comment', 'field': 'message', 'width': '300px'},
+					  {'name': 'Score', 'field': 'score', 'width': '50px'},
+					  {'name': 'Delete', 'field': 'delete', 'width': '100px',
+						formatter: function (val) {
+							 var a = construct.create('a',
+									{
+										href: '#',
+										innerHTML: "delete",
+										title: "Delete comment"
+									},
+									construct.create('span'));
+							
+	//						 on(a, 'click', lang.partial(function(){alert();}));
+
+							 return a.parentNode.innerHTML;
+						 },
+						 get: function (rowIdx, row) {
+							 return row;
+						 }
+					}
+					]];
+
+					/*create a new grid*/
+					var grid = new DataGrid({
+						id: 'grid',
+						structure: layout,
+						store: store,
+						selectionMode: 'extended',
+						sortInfo: -4,
+						rowSelector: '20px'});
+
+					/*append the new grid to the div*/
+					grid.placeAt("gridDiv");
+
+					/*Call startup() to render the grid*/
+					grid.startup();
+
+					on(grid, 'rowClick', function(e){
+						console.log(e.cell);
+						if (!(e.cell && e.cell.field==='delete'))
+							return;
+
+						var item = e.grid.getItem(e.rowIndex);
+	//					storeItem = e.grid.store._itemsByIdentity[item.id];
+
+						window.log('Sending delete request to FB: "'+item.message+'"');
+						console.log(item.id[0] + ': deleting...');
+			
+						 FB.api(item.id[0], 'delete', function(response) {
+							   console.log(response);
+							   if (!response || response.error) {
+									console.log('Error deleting from FB: ', item.id[0]);
+							  } else {
+									e.grid.store.deleteItem(item);					
+									e.grid.store.save();
+									console.log(item.id[0] + ': deleted from FB.');
+									window.log('Delete successful: "'+item.message+'"');
+							  }
+						 });
+					});
+
+					window.grid=grid;
+			
+			};
+
 
 			window.log = function(msg){
 				construct.create('div',{
@@ -269,16 +276,32 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 							 });
 					   }
 				   });
+					store.save();
+					store.fetch({sort:[{attribute: "score", descending: true}]});
 				 });
 
-				store.save();
-				store.fetch({sort:[{attribute: "score", descending: true}]});
 				
 
 				if (config.isDebug)
 				{
 					style.set(registry.byId('button_createTestComments').domNode, 'display', '');
 				}
+			};
+
+			window.fbLogin = function() {
+				 FB.login(function(response) {
+				   if (response.authResponse) {
+					style.set('fb_login', 'display', 'none');
+					window.initGrid();
+					 console.log('Welcome!  Fetching your information.... ');
+					 FB.api('/me', function(response) {
+					   console.log('Good to see you, ' + response.name + '.');
+					 });
+
+				   } else {
+					 console.log('User cancelled login or did not fully authorize.');
+				   }
+				 }, {scope:'manage_pages,publish_stream'});				
 			};
 
 			window.returnAccounts = function(response) {
@@ -362,30 +385,17 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 
 				FB.getLoginStatus(function(response) {
 				  if (response.status === 'connected') {
-					// the user is logged in and has authenticated your
-					// app, and response.authResponse supplies
-					// the user's ID, a valid access token, a signed
-					// request, and the time the access token 
-					// and signed request each expire
 					var uid = response.authResponse.userID;
 					var accessToken = response.authResponse.accessToken;
+
+					style.set('fb_login', 'display', 'none');
+					window.initGrid();
+
 //				  } else if (response.status === 'not_authorized') {
 					// the user is logged in to Facebook, 
 					// but has not authenticated your app
 				  } else {
-					// the user isn't logged in to Facebook.
-					window.log('Hej! Kan vara lite svårt att ansluta till Facebook. Först måste man se till att inga popups blockeras. Sen är det bara att vara ihärdig. Facebook behöver ibland övertygas om att man menar allvar med att logga in. Klicka, klicka, klicka....');
-						 FB.login(function(response) {
-						   if (response.authResponse) {
-							 console.log('Welcome!  Fetching your information.... ');
-							 FB.api('/me', function(response) {
-							   console.log('Good to see you, ' + response.name + '.');
-							 });
-
-						   } else {
-							 console.log('User cancelled login or did not fully authorize.');
-						   }
-						 }, {scope:'manage_pages,publish_stream'});
+					  style.set('fb_login', 'display', 'block');
 				  }
 				 });
 			  };
