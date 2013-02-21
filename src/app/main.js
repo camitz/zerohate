@@ -59,28 +59,28 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			'dojo/date/stamp',
 			'dojo/date/locale',
 			'dojox/html/entities',
+			"dojo/text!app/resources/keywords.txt",
+			'dojo/ready',
 			'dojo/domReady!'
 		], 
-			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry, cookie, CheckBox, stamp, locale, html) {
+			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry, cookie, CheckBox, stamp, locale, html, keywords, ready) {
 
 				window.settings = cookie('settings') ? json.fromJson(cookie('settings')) :
 					{
 						keywords: {}
 					};
 
-				if (!window.settings.keywords.version || window.settings.keywords.version < 1)
-					window.settings.keywords = {
-							version: 1,
-							moderate: ['blatt','riktig slyna','riktig hora','ful','hiskeligt ful','grotesk','groteskt ful','ful kvinna','fulaste kvinna','subba','pryd','jävla subba','knulla','patetisk','mental','underlägsen','såna som du','sådana som du','kärring','jävla kärring','svenskfientlig','svin','jävla svin','kackerlacka','hålla käften','håll käft','uppkörd','köra upp','intelligen','trygg','knulla dig','din fitta','straff','straffknulla','muslimälska','massa muslimer','massa invandrare','prissdränkta ','fittluder','hipsterkryp','luder','dränka','dränker sig','feministhora','fet','äcklig','din jävla','din ful','ska dö','neger','feministas','feministsvin','manshatare','ditt äcklig','din äcklig','bra feminist','stoppa kuken','kuken i di','det där ansiktet','sex'],
-							severe: ['kvar att leva','knulla sönder','knullas sönder','dö','döda','ultimatum','skära halsen','halsen av dig','kniven','minst anar','mörda','mörda dig','gruppvåldta','utanför din dörr','utanför ditt hus','utanför ditt hem','steka dina bröst','','styckning','köttkrokar','polisjävlar','basebollträ','vet var du bor']
-					};
+				if (!window.settings.keywords.version || window.settings.keywords.version < 2)
+					window.settings.keywords = json.fromJson(keywords);
 						
 				cookie('settings', json.toJson(window.settings), { expires: 'Sat, 12 Nov 2022 11:32:50 GMT', path: "/" });
 
 
+				ready(function() {
 				parser.parse().then(function() {
 					window.keywordChange('Severe');
 					window.keywordChange('Moderate');
+				})
 				});
 
 				window.keywordChange = function(level) {
@@ -248,8 +248,21 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			};
 
 			window.score = function(message) {
-				var severeRex = new RegExp(registry.byId('textarea_keywordsSevere').get('value').split(', ').join('|'), 'igm');
-				var moderateRex = new RegExp(registry.byId('textarea_keywordsModerate').get('value').split(', ').join('|'), 'igm');
+				var severeRex = new RegExp(
+					array.map(
+							registry.byId('textarea_keywordsSevere')
+							.get('value').split(','), function(kw) {
+									return kw.trim() ? kw.trim() : "¤¤¤¤¤¤¤"; 
+								})
+						.join('|'), 'igm');
+
+				var moderateRex = new RegExp(
+					array.map(
+							registry.byId('textarea_keywordsModerate')
+							.get('value').split(','), function(kw) { 
+								return kw.trim() ? kw.trim() : "¤¤¤¤¤¤¤"; 
+							})
+						.join('|'), 'igm');
 
 				return message.match(severeRex) ? message.match(severeRex).length * 100 : 0
 					+ message.match(moderateRex) ? message.match(moderateRex).length : 0;
@@ -283,7 +296,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					window.log("Fetching posts. Please hang on.");
 					var options = {limit:5000};
 					FB.api('/'+page.id+'/posts', options, function(response) {
-						window.log("Retrieved " + response.data.length + " commments.");
+						window.log("Retrieved " + response.data.length + " posts.");
 					   console.log(response);
 
 					   array.forEach(response.data, function(post){

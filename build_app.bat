@@ -33,7 +33,7 @@ echo " Done"
 
 cd %TOOLSDIRw%
 
-rem java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar;../closureCompiler/compiler.jar;../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require %LOADERCONF% --profile %PROFILE% --releaseDir %DISTDIR%
+java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar;../closureCompiler/compiler.jar;../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require %LOADERCONF% --profile %PROFILE% --releaseDir %DISTDIR%
 
 cd %BASEDIR%
 

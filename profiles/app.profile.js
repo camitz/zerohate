@@ -72,7 +72,7 @@ var profile = {
 			// the main application `app/main` and the `dojo/i18n` and `dojo/domReady` modules because, while they are
 			// all conditional dependencies in `app/main`, we do not want to have to make extra HTTP requests for such
 			// tiny files.
-			include: [ 'dojo/i18n', 'dojo/domReady', 'app/main', 'app/run' ],
+			include: [ 'dojo/i18n', 'dojo/domReady' ],
 
 			// By default, the build system will try to include `dojo/main` in the built `dojo/dojo` layer, which adds
 			// a bunch of stuff we do not want or need. We want the initial script load to be as small and quick to
@@ -86,7 +86,38 @@ var profile = {
 		// to roll everything into a single layer, but this helps provide a basic illustration of multi-layer builds.)
 		// Note that when you create a new layer, the module referenced by the layer is always included in the layer
 		// (in this case, `app/Dialog`), so it does not need to be explicitly defined in the `include` array.
-		//'app/Dialog': {}
+		'app/main': {
+			include: [
+				'dojo/parser', 
+				'dojo/_base/json',
+				'dojo/_base/array',
+				'dojo/_base/lang',
+				'dojo/dom-construct',
+				'dojo/on',
+				'dojo/dom',
+				'dojox/grid/DataGrid', 
+				'dojo/data/ItemFileWriteStore',
+				'dojo/Deferred',
+				'dojo/promise/all',
+				'dojo/_base/config',
+				'dojo/dom-style',
+				'dijit/registry',
+				'dojo/cookie',
+				'dijit/form/CheckBox',
+				'dojo/date/stamp',
+				'dojo/date/locale',
+				'dojox/html/entities',
+
+				'dijit/form/Textarea',
+				'dijit/form/TextBox',
+				'dijit/form/Button',
+				'dijit/layout/BorderContainer',
+				'dijit/layout/ContentPane',
+				'dijit/layout/AccordionContainer',
+				'dijit/layout/AccordionPane',
+				'dijit/layout/TabContainer'
+			]
+		}
 	},
 
 	// Providing hints to the build system allows code to be conditionally removed on a more granular level than

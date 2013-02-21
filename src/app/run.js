@@ -23,23 +23,9 @@ require({
 		'dojo',
 		'dijit',
 		'dojox',
-
-		// For reference, this is what a more verbose package declaration looks like.
-		{ name: 'app', location: 'app', map: {} }
+		'app'
 	]
 // Require `app`. This loads the main application module, `app/main`, since we registered the `app` package above.
 }, [ 
-	'app',
-	"dojo/parser", 
-	'dojo/_base/json',
-	'dojo/_base/array',
-	'dojo/_base/lang',
-	'dojo/dom-construct',
-	'dojo/on',
-	'dojo/dom',
-	'dojox/grid/DataGrid', 
-	'dojo/data/ItemFileWriteStore',
-	'dojo/Deferred',
-	'dojo/promise/all',
-	'dojo/_base/config'
+	'app'
 ]);
