@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Zero hate</title>
+    <!-- Application-specific CSS should be stored in your application’s package to ensure portability and to allow
+         the build system to combine & minify it. -->
+    <link rel="stylesheet" href="help/resources/help.css">
+	<style>
+		@import "dojox/grid/resources/claroGrid.css";
+
+		/*Grid needs an explicit height by default*/
+		.middle {
+			margin: 20px auto;
+			width: 650px;
+		}
+		#formContainer form {
+			clear:both;
+			argin:60px 0px;
+			padding: 0;
+		}
+
+		#formContainer textarea {
+			min-height: 60px;
+			width:430px;
+			float:left;
+		}
+
+		#formContainer .dijitButton {
+			float:left;
+			line-height: 40px;
+		}
+
+		#formContainer .checkboxes {
+			width:90px;
+			float:left;
+			margin: 0 0 0 10px;
+			height: 82px;
+		}
+
+		#formContainer .loadingIcon {
+		  background: url("help/resources/loading.gif") no-repeat scroll right top transparent;
+		  height: 24px;
+		  width: 24px;
+		  display:none;
+		  vertical-align:middle;
+		  line-height: 40px;
+		  float:left;
+		}
+
+		#formContainer .thanks {
+			float:left;
+			line-height: 45px;
+			margin: 0 5px;
+			font-style:italic;
+		}
+
+		#subFormContainer {
+			background: white;
+			position:relative;
+		}
+	</style>
+</head>
+<body class="claro">
+	<div id="fb-root"></div>
+    <script src="dojoConfig.js"></script>
+    <!-- dojo.js is an AMD-compliant loader script. It accepts configuration either from a data-dojo-config attribute,
+         as shown here, from a global dojoConfig object (which must be defined *before* dojo.js is loaded), or from
+         a global require object.
+
+         Configuration options for the loader can be viewed at http://dojotoolkit.org/reference-guide/loader/amd.html
+         along with a bunch of additional information about its features.
+
+         Below, we’re doing the following:
+
+         1. Enabling the AMD loader. (async: 1)
+         2. Fixing the loader to use normal AMD resolution of unregistered module paths (relative to baseDir)
+            instead of the traditional Dojo resolution method (relative to the parent of baseDir).
+            (tlmSiblingOfDojo: 0)
+         3. Enabling debugging. (isDebug: 1)
+
+         The remainder of Dojo configuration, as well as our application’s instantiation, occurs within
+         app/run.js.
+
+		 NOTE: `build.sh` is responsible for removing the "isDebug" flag when deploying to production. If you modify
+		 this flag at all, you will break the build! -->
+    <script src="dojo/dojo.js"></script>
+
+    <!-- Load the loader configuration script. Note that this module ID is hard-coded in build.sh in order to provide
+         an optimised build that loads as few as one script for the entire application. If you change the name or
+         location of this module, you will need to update build.sh too. -->
+    <script src="help/run.js"></script>
+	
+	<div class="middle">
+		<div class="splash">
+			<h2>Hej!</h2>
+			<p>Zero Hate är en gratis webbtjänst som hjälper organisationer att snabbt rensa ut hotfulla eller kränkande kommentarer på sina sidor. Just nu finns i bakgrunden finns en enkel robothjärna som letar efter kända ord i kommentaren. På så sätt kan vi sortera kommenterarerna så att en moderator lätt och jättesnabbt kan ta bort dem.</p>
+			
+			
+			<p>Vi vill träna upp "hjärnan" att bli bättre på att urskilja vad som är hotfullt/kränkande och vad som inte är det.</p>
+			<h2>Vi behöver din hjälp!</h2>
+			<p>Vi behöver samla in några tusen verkliga kommentarer att träna robothjärnan på. Ju fler kommentarer att träna på desto bättre kommer robothjärnan att bli.</p>
+			<p>Både snälla och hotfulla/kränkande kommentarer behövs i lika stor mängd. Det enda kravet är att de är verkliga, alltså kommentarer som du fått eller skrivit på väggposter på Facebook, tidningsforum eller liknande. Mata in så många du vill. Ju fler desto bättre blir algoritmen.</p>
+			<p>Vi behandlar de kommentarer du lämnar <b>anonymt</b> och vi lovar att endast använda kommentarerna <b>inom projektets ramar</b>. Vi har bakgrund inom medicinsk forskning och vi vet vad personuppgiftslagen och forskningsetik innebär.</p>
+
+			<h2>Men!</h2>
+
+			<p>Som de forskare vi är ser vi potentialen med en sådan här datainsamling. Många forskare kommer vara intresserad av att få tillgång till denna data i en eller annan form till all möjlig slags forskning, till gagn mot näthatet.</p>
+
+			<p>Vill du så kan du ange din epost adress. Då kommer vi fråga dig om samtycke om det blir aktuellt att använda data i ett nytt projekt. </p>
+
+			<p>Eller ännu bättre, de oss samtycke redan nu för att data ska hållas tillgängliga för all forskningsverksamhet. Det är nätkärlek, det!</p>
+
+			<p>Hjälp oss att göra nätet mer demokratiskt och mer fritt! Sprid ordet om vårt initiativ!</p>
+			<h2>Mer info</h2>
+			<p><a href="http://www.youtube.com/watch?v=eRk0Wtcd-xU">Screencast</a><br/>
+			Bloggat om <a href="http://blog.simpletask.se/nollhat">Zero Hate</a> och om <a href="http://blog.simpletask.se/nollhat">insamligen</a>.<br/>
+			Programmet <a href="http://zerohate.simpletask.se">Zero Hate</a></p>
+			<p>Tack!<br/>
+			/Martin & Måns</p>
+		</div>
+
+		<p style="border-top:solid black thin;padding-top:40px; margin-bottom:20px"><i>Iom att du trycker skicka så samtycker du till insamling och behandling av din data inom ramen för det ideella initiativet Zero Hate.</i></p>
+
+		<!---<p><i>Ta bort namn och andra personuppgifter i </i></p>--->
+
+		<div><input id="cb_open" data-dojo-type="dijit/form/CheckBox" value="agreed" /> <label for="mycheck"><b>Frivilligt:</b> Jag vill att de kommentarerer jag skickar in ska ingå i en öppen databas för forskning.</label><br/><br/>
+		<input type="text"  data-dojo-type="dijit/form/TextBox" data-dojo-props="trim:true, placeholder:'Frivillig epostadress'" id="tb_email" /></div>
+		
+		<div id="formContainer" style="margin-top:20px;"></div><br/>
+		<div style="clear:both"><i>Sluta inte här! Ladda om sidan och börja om!</i></div>
+	</div>
+	<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38434770-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>

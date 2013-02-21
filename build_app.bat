@@ -33,7 +33,7 @@ echo " Done"
 
 cd %TOOLSDIRw%
 
-java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar;../closureCompiler/compiler.jar;../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require %LOADERCONF% --profile %PROFILE% --releaseDir %DISTDIR%
+rem java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar;../closureCompiler/compiler.jar;../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require %LOADERCONF% --profile %PROFILE% --releaseDir %DISTDIR%
 
 cd %BASEDIR%
 
@@ -43,6 +43,7 @@ rem mkdir dist\nls
 rem copy Scripts\nls\dojo_sv.js dist\nls
 
 copy %SRCDIRw%\*.html %DISTDIRw%
+copy %SRCDIRw%\dojoConfig.js %DISTDIRw%
 
 echo "Build complete"
 

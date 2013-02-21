@@ -55,15 +55,19 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 			'dojo/dom-style',
 			'dijit/registry',
 			'dojo/cookie',
+			'dijit/form/CheckBox',
+			'dojo/date/stamp',
+			'dojo/date/locale',
+			'dojox/html/entities',
 			'dojo/domReady!'
 		], 
-			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry, cookie) {
+			function (parser, json, array, lang, construct, on, dom, DataGrid, ItemFileWriteStore, Deferred, all, config, style, registry, cookie, CheckBox, stamp, locale, html) {
 
 				window.settings = cookie('settings') ? json.fromJson(cookie('settings')) :
 					{
 						keywords: {
-							severe: ['våldta', 'döda', 'vet var du bor'],
-							moderate: ['slyna']
+							severe: ['våldta', 'döda', 'vet var du bor', 'basebollträ'],
+							moderate: ['slyna', 'hora']
 						}
 					};
 
@@ -225,7 +229,7 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 					+ message.match(moderateRex) ? message.match(moderateRex).length : 0;
 			}
 
-			window.setPage = function(id, access_token) {
+			window.togglePage = function(id, access_token) {
 				console.log('setPage ' + id + ' ' + access_token);
 
 				 FB.api('/'+id+'/posts', {limit:5000}, function(response) {
@@ -274,6 +278,20 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				}
 			};
 
+			window.returnAccounts = function(response) {
+				window.log("Retrieved " + response.data.length + " pages");
+			   console.log(response);
+			   array.forEach(response.data, function(account){
+					var n = construct.create('li', {},'pages_list', 'append');
+
+
+					var cb = new CheckBox();
+					n.appendChild(cb.domNode);
+					n.appendChild(document.createTextNode(account.name));
+					on(cb, 'change', lang.partial(togglePage, account.id, account.access_token));
+			   });
+			 };
+
 			 window.fbAsyncInit = function() {
 				// init the FB JS SDK
 				FB.init({
@@ -288,16 +306,8 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				FB.Event.subscribe('auth.logout', function (response) {
 					 console.debug('auth.logout'+json.toJson(response));
 
-				 FB.api('/me/accounts', function(response) {
-				   console.log(response);
-				   array.forEach(response.data, function(account){
-						var n = construct.create('li', {
-							innerHTML: account.name
-						}, 'pages_list', 'append');
-						
-						on(n, 'click', lang.partial(setPage, account.id, account.access_token));
-				   });
-				 });
+				 window.log("Fetching pages. Please hang on.");
+				 FB.api('/me/accounts', window.returnAccounts);
 
 
 
@@ -331,19 +341,11 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 						var uid = response.authResponse.userID;
 						var accessToken = response.authResponse.accessToken;
 
-						 FB.api('/me/accounts', function(response) {
-						   console.log(response);
-						   array.forEach(response.data, function(account){
-								var n = construct.create('li', {
-									innerHTML: account.name
-								}, 'pages_list', 'append');
-								
-								window.page_access_token = account.access_token;
-								on(n, 'click', lang.partial(setPage, account.id, account.access_token));
-						   });
-						 });
-
-
+						if (!dom.byId('pages_list').children.length)
+						{
+							 window.log("Fetching pages. Please hang on.");
+							 FB.api('/me/accounts', window.returnAccounts);
+						}
 					}
 				});
 
