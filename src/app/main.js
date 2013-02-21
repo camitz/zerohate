@@ -98,7 +98,10 @@ define([ 'dojo/has', 'require' ], function (has, require) {
 				/*set up layout*/
 				var layout = [[
 				  {'name': 'Name', 'field': 'name', 'width': '100px'},
-				  {'name': 'Time', 'field': 'create_time', 'width': '100px'},
+				  {'name': 'Time', 'field': 'created_time', 'width': '120px', formatter: function(value) { 
+							return value && stamp.fromISOString(value) ? locale.format(stamp.fromISOString(value), {datePattern:'yyyy-MM-dd', timePattern:'HH:mm:ss'}) : value; 
+						}
+				  },
 				  {'name': 'Comment', 'field': 'message', 'width': '300px'},
 				  {'name': 'Score', 'field': 'score', 'width': '300px'},
 				  {'name': 'Delete', 'field': 'delete', 'width': '100px',
